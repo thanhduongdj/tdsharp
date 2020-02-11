@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\TDLib\TDLib.csproj" />
+        <ProjectReference Include="..\TDLib.Tests\TDLib.Tests.csproj" />
     </ItemGroup>
 
     <ItemGroup>
