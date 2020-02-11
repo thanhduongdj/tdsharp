@@ -10,7 +10,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="tdlib.native" Version="1.6.0.777" />
     </ItemGroup>
 
 </Project>
