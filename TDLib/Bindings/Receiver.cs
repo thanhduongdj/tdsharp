@@ -11,27 +11,30 @@ namespace TDLib.Bindings
     {
         private readonly Converter _converter;
         private readonly TdJsonClient _tdJsonClient;
-        
+
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
         private readonly ManualResetEventSlim _stopped = new ManualResetEventSlim(false);
-        
+
         internal event EventHandler<TdApi.Object> Received;
         internal event EventHandler<TdApi.AuthorizationState> AuthorizationStateChanged;
         internal event EventHandler<Exception> ExceptionThrown;
-        
+
         internal Receiver(TdJsonClient tdJsonClient)
         {
             _converter = new Converter();
             _tdJsonClient = tdJsonClient;
         }
-        
+
         internal void Start()
-        {   
+        {
+            Console.WriteLine("Thread id = " + Thread.CurrentThread.ManagedThreadId);
             Task.Factory.StartNew(async () =>
                 {
                     try
                     {
+                        Console.WriteLine("Thread id = " + Thread.CurrentThread.ManagedThreadId);
                         await Task.Yield();
+                        Console.WriteLine("Thread id = " + Thread.CurrentThread.ManagedThreadId);
                         ProcessEvents();
                     }
                     finally
@@ -76,7 +79,7 @@ namespace TDLib.Bindings
             {
                 _cts.Cancel();
             }
-            
+
             _stopped.Wait();
         }
     }
