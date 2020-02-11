@@ -6,11 +6,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="tdlib.native" Version="1.6.0.777" />
+        <ProjectReference Include="..\TDLib\TDLib.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\TDLib\TDLib.csproj" />
+      <PackageReference Include="tdlib.native" Version="1.6.0.777" />
     </ItemGroup>
 
 </Project>
