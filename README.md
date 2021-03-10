@@ -1,6 +1,6 @@
-# TDSharp
+# TDLib
 
-TDSharp - .NET bindings for TDLib (Telegram Database Library) JSON API: https://github.com/tdlib/td
+.NET bindings for TDLib (Telegram Database Library): https://github.com/tdlib/td
 * Generated API bindings
 * .NET Core and .NET Standard support
 
@@ -12,56 +12,58 @@ Install via NuGet: ```TDLib```
 
 ### Dependencies
 
-[Build TDLib](https://core.telegram.org/tdlib/docs/index.html#building) and put the compiled library into your project's output directory
-* tdjson.dll (Windows)
+You're recommended to use precompiled version of TDLib native artifacts from NuGet: ```TDLib.Native```
+
+[![NuGet](https://img.shields.io/nuget/v/tdlib.native.svg)](https://www.nuget.org/packages/tdlib.native/)
+
+Note that `tdlib.native` is not a dependency of `TDLib`, so you may choose to build the binaries yourself and provide them at the runtime.
+
+To do that, [build TDLib](https://core.telegram.org/tdlib/docs/index.html#building) and put the compiled library into your project's output directory
+* tdjson.dll (Windows) (optionally accompanied by other DLL files from the build directory if you want to bundle OpenSSL and ZLib dependencies as well)
 * libtdjson.dylib (MacOS)
 * libtdjson.so (Linux)
 
-### Simple example
+### Using json client
 
-Client is a wrapper around native JSON API. Use it to send/receive data as strings.
+TdJsonClient is a wrapper around native JSON APIs. Use it to send/receive data as strings.
 
 ```csharp
-using TD;
+using TdLib;
 
-// create client
-var client = new Client();
-// sending data
-client.Send(json);
-// synchronous execution
-var result = client.Execute(json);
-// receiving data
-while (true)
+var json = ""; // json data
+double timeout = 1.0; // 1 second
+
+using (var jsonClient = new TdJsonClient())
 {
-    result = cient.Receive(timeout);
+    jsonClient.Send(json); // send request
+    var result = jsonClient.Receive(timeout); // receive response
 }
 ```
 
-### Using generated APIs
+### Using strongly typed APIs
 
-Lib contains classes for API types and methods. It handles json serialization/deserialization behind the scenes. Use Hub to subscribe to events. Use Dialer to asynchronously call methods.
+This library contains generated classes for objects and functions. JSON serialization and deserialization is handled automatically. Use TdClient to asynchronously execute functions.
 
 ```csharp
-using TD;
+using TdLib;
 
-// receiving data
-var hub = new Hub(client);
-hub.Received += data =>
+using (var client = new TdClient())
 {
-    if (data is Ok)
+    try
     {
-        // do something
+        // asynchronously execute function
+        TdApi.Ok ok = await client.ExecuteAsync(new TdApi.SetAuthenticationPhoneNumber
+        {
+            PhoneNumber = phoneNumber
+        });
+
+        // do something...
     }
-    else if (data is Error)
+    catch (ErrorException e)
     {
-        // handle error
+        TdApi.Error error = e.Error;
+
+        // handle error...
     }
 }
-
-// asynchronous execution
-var dialer = new Dialer(client, hub);
-var ok = await dialer.ExecuteAsync(new SetAuthenticationPhoneNumber
-{
-    PhoneNumber = phoneNumber
-});
 ```
