@@ -1,6 +1,6 @@
-# TDSharp
+# TDLib
 
-TDSharp - .NET bindings for TDLib (Telegram Database Library) JSON API: https://github.com/tdlib/td
+.NET bindings for TDLib (Telegram Database Library): https://github.com/tdlib/td
 * Generated API bindings
 * .NET Core and .NET Standard support
 
@@ -12,8 +12,14 @@ Install via NuGet: ```TDLib```
 
 ### Dependencies
 
-[Build TDLib](https://core.telegram.org/tdlib/docs/index.html#building) and put the compiled library into your project's output directory
-* tdjson.dll (Windows)
+You're recommended to use precompiled version of TDLib native artifacts from NuGet:
+
+[![NuGet](https://img.shields.io/nuget/v/tdlib.native.svg)](https://www.nuget.org/packages/tdlib.native/)
+
+Note that `tdlib.native` is not a dependency of `TDLib`, so you may choose to build the binaries yourself and provide them at the runtime.
+
+To do that, [build TDLib](https://core.telegram.org/tdlib/docs/index.html#building) and put the compiled library into your project's output directory
+* tdjson.dll (Windows) (optionally accompanied by other DLL files from the build directory if you want to bundle OpenSSL and ZLib dependencies as well)
 * libtdjson.dylib (MacOS)
 * libtdjson.so (Linux)
 
@@ -22,7 +28,7 @@ Install via NuGet: ```TDLib```
 Client is a wrapper around native JSON API. Use it to send/receive data as strings.
 
 ```csharp
-using TD;
+using TdLib;
 
 // create client
 var client = new Client();
@@ -39,20 +45,20 @@ while (true)
 
 ### Using generated APIs
 
-Lib contains classes for API types and methods. It handles json serialization/deserialization behind the scenes. Use Hub to subscribe to events. Use Dialer to asynchronously call methods.
+This library contains generated classes for API objects and functions. It handles json serialization/deserialization behind the scenes. Use Hub to subscribe to events. Use Dialer to asynchronously call functions.
 
 ```csharp
-using TD;
+using TdLib;
 
 // receiving data
 var hub = new Hub(client);
 hub.Received += data =>
 {
-    if (data is Ok)
+    if (data is TdApi.Ok)
     {
         // do something
     }
-    else if (data is Error)
+    else if (data is TdApi.Error)
     {
         // handle error
     }
@@ -60,8 +66,17 @@ hub.Received += data =>
 
 // asynchronous execution
 var dialer = new Dialer(client, hub);
-var ok = await dialer.ExecuteAsync(new SetAuthenticationPhoneNumber
+try
 {
-    PhoneNumber = phoneNumber
-});
+    TdApi.Ok ok = await dialer.ExecuteAsync(new TdApi.SetAuthenticationPhoneNumber
+    {
+        PhoneNumber = phoneNumber
+    });
+    // do something
+}
+catch (ErrorException e)
+{
+    TdApi.Error error = e.Error;
+    // handle error
+}
 ```
